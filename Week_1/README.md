@@ -221,14 +221,12 @@ Here are the 5 typos:
   - ![](Images/04.png)
 
 
-## Extras
-
-### Keras
-
+## Keras
+### What is Keras
 - Keras is a high-level neural networks API (programming framework), written in Python and capable of running on top of several lower-level frameworks including TensorFlow, Theano, and CNTK.
-- Keras was developed to enable deep learning engineers to build and experiment with different models very quickly.
 - Just as TensorFlow is a higher-level framework than Python, Keras is an even higher-level framework and provides additional abstractions.
-- Keras will work fine for many common models.
+
+### Key data structure
 - Layers in Keras:
   - Dense (Fully connected layers).
     - A linear function followed by a non linear function.
@@ -240,20 +238,29 @@ Here are the 5 typos:
     - Flatten a matrix into vector.
   - Activation layer
     - Different activations include: relu, tanh, sigmoid, and softmax.
-- To train and test a model in Keras there are four steps:
+
+- Models in Keras
+    
+### To train and test a model in Keras there are four steps:
+- Summarize of step in Keras: Create->Compile->Fit/Train->Evaluate/Test
   1. Create the model.
   2. Compile the model by calling `model.compile(optimizer = "...", loss = "...", metrics = ["accuracy"])`
   3. Train the model on train data by calling `model.fit(x = ..., y = ..., epochs = ..., batch_size = ...)`
      - You can add a validation set while training too.
   4. Test the model on test data by calling `model.evaluate(x = ..., y = ...)`
-- Summarize of step in Keras: Create->Compile->Fit/Train->Evaluate/Test
+  
 - `Model.summary()` gives a lot of useful informations regarding your model including each layers inputs, outputs, and number of parameters at each layer.
 - To choose the Keras backend you should go to `$HOME/.keras/keras.json` and change the file to the desired backend like Theano or Tensorflow or whatever backend you want.
-- After you create the model you can run it in a tensorflow session without compiling, training, and testing capabilities.
+- Model plot functions: `keras.utils.plot_model(model, "my_first_model_with_shape_info.png", show_shapes=True)`
 - You can save your model with `model_save` and load your model using `model_load ` This will save your whole trained model to disk with the trained weights.
 
+### Functional API (VS model subclassing)
+[Link](https://keras.io/guides/functional_api/)
+1. inputs = keras.Input(shape=(784,)): The shape of the data is set as a 784-dimensional vector. The batch size is always omitted since only the shape of each sample is specified.
+2. inputs.shape: TensorShape([None, 784])
+3. you can create a Model by specifying its inputs and outputs in the graph of layers: model = keras.Model(inputs=inputs, outputs=outputs, name="mnist_model")
+4. saved file includes the: - model architecture - model weight values (that were learned during training) - model training config, if any (as passed to compile) - optimizer and its state, if any (to restart training where you left off)
 
-<br><br>
 <br><br>
 These Notes were made by [Yuxiang ZHANG](mailto:kimiyuxiang@gmail.com) @2020
 
