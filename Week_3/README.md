@@ -19,19 +19,17 @@
 > Learn how to apply your knowledge of CNNs to one of the toughest but hottest field of computer vision: Object detection.
 
 ### Object Localization
-
-- Object detection is one of the areas in which deep learning is doing great in the past two years.
-
+Going from image classification to localization and finally object detection. 
 - What are localization and detection?
 
   - **Image Classification**: 
-    - Classify an image to a specific class. The whole image represents one class. We don't want to know exactly where are the object. Usually only one object is presented.
+    - Classify an image to a specific class. 
     - ![](Images/Classification.jpg)
   - **Classification with localization**:
-    - Given an image we want to learn the class of the image and where are the class location in the image. We need to detect a class and a rectangle of where that object is. Usually only one object is presented.
+    - Given an image we want to learn the class of the image and where are the class location in the image. 
     - ![](Images/ClassificationLoc.jpg)
   - **Object detection**:
-    - Given an image we want to detect all the object in the image that belong to a specific classes and give their location. An image can contain more than one object with different classes.
+    - Given an image we want to detect all the object in the image that belong to a specific classes and give their location. 
     - ![](Images/ObjectDetection.png)
   - **Semantic Segmentation**:
     - We want to Label each pixel in the image with a category label. Semantic Segmentation Don't differentiate instances, only care about pixels. It detects no objects just pixels.
@@ -42,8 +40,7 @@
     - ![](Images/InstanceSegmentation.png)
 
 - To make image classification we use a Conv Net with a Softmax attached to the end of it.
-
-- To make classification with localization we use a Conv Net with a softmax attached to the end of it and a four numbers `bx`, `by`, `bh`, and `bw` to tell you the location of the class in the image. The dataset should contain this four numbers with the class too.
+- To make classification with localization we use a Conv Net with a softmax attached to the end of it and a four numbers `bx`, `by`, `bh`, and `bw` to tell you the location of the class in the image.
 
 - Defining the target label Y in classification with localization problem: 
 
@@ -60,54 +57,22 @@
     ]
     ```
 
-  - Example (Object is present):
-
-    - ```
-      Y = [
-        		1		# Object is present
-        		0
-        		0
-        		100
-        		100
-        		0
-        		1
-        		0
-      ]
-      ```
-
-  - Example (When object isn't presented):
-
-    - ```
-      Y = [
-        		0		# Object isn't presented
-        		?		# ? means we dont care with other values
-        		?
-        		?
-        		?
-        		?
-        		?
-        		?
-      ]
-      ```
-
 - The loss function for the Y we have created (Example of the square error):
 
-  - ```
-    L(y',y) = {
-      			(y1'-y1)^2 + (y2'-y2)^2 + ...           if y1 = 1
-      			(y1'-y1)^2						if y1 = 0
-    		}
-    ```
-
+  -     L(y',y) = { (y1'-y1)^2 + (y2'-y2)^2 + ...   if y1 = 1, 
+  					(y1'-y1)^2			     	    if y1 = 0  }
+    
   - In practice we use logistic regression for `pc`, log likely hood loss for classes, and squared error for the bounding box.
+
 
 ### Landmark Detection
 
 - In some of the computer vision problems you will need to output some points. That is called **landmark detection**.
 
-- For example, if you are working in a face recognition problem you might want some points on the face like corners of the eyes, corners of the mouth, and corners of the nose and so on. This can help in a lot of application like detecting the pose of the face.
+- For example, if you are working in a face recognition problem you might want some points on the face like corners of the eyes, corners of the mouth, and corners of the nose and so on. 
+- This can help in a lot of application like detecting the emotion or the gesture of a person based on these landmarks.
 
-- Y shape for the face recognition problem that needs to output 64 landmarks:
+- The key here is to define Label Y. 
 
   - ```
     Y = [
@@ -120,47 +85,48 @@
     ]
     ```
 
-- Another application is when you need to get the skeleton of the person using different landmarks/points in the person which helps in some applications.
-
-- Hint, in your labeled data, if `l1x,l1y` is the left corner of left eye, all other `l1x,l1y` of the other examples has to be the same.
-
 ### Object Detection
 
-- We will use a Conv net to solve the object detection problem using a technique called the sliding windows detection algorithm.
-- For example lets say we are working on Car object detection.
 - The first thing, we will train a Conv net on cropped car images and non car images.
+  - The ratio between positive and negative example could be 1:3.
+  - Before training a classifier, we need to re-size each training example. 
   - ![](Images/18.png)
-- After we finish training of this Conv net we will then use it with the sliding windows technique.
+
+- Inference: after we finish training of this Conv net we will then use it with the sliding windows technique.
+
 - Sliding windows detection algorithm:
   1. Decide a rectangle size.
-  2. Split your image into rectangles of the size you picked. Each region should be covered. You can use some strides.
-  3. For each rectangle feed the image into the Conv net and decide if its a car or not.
-  4. Pick larger/smaller rectangles and repeat the process from 2 to 3.
-  5. Store the rectangles that contains the cars.
-  6. If two or more rectangles intersects choose the rectangle with the best accuracy.
+  2. Split your image into rectangles of the size you picked. For each rectangle feed the image into the Conv net and decide if its a car or not.
+  3. Pick larger/smaller rectangles and repeat the process 2.
+  4. Store the rectangles that contains the cars.
+  5. If two or more rectangles intersects choose the rectangle with the best accuracy.
+
 - Disadvantage of sliding window is the computation time.
-- In the era of machine learning before deep learning, people used a hand crafted linear classifiers that classifies the object and then use the sliding window technique. The linear classier make it a cheap computation. But in the deep learning era that is so  computational expensive due to the complexity of the deep learning model.
-- To solve this problem, we can implement the sliding windows with a ***Convolutional approach***.
-- One other idea is to compress your deep learning model.
+	- To solve this problem, we can implement the sliding windows with a ***Convolutional approach***.
+	- One other idea is to compress your deep learning model.
 
 ### Convolutional Implementation of Sliding Windows
 
 - Turning FC layer into convolutional layers (predict image class from four classes):
   - ![](Images/19.png)
-  - As you can see in the above image, we turned the FC layer into a Conv layer using a convolution with the width and height of the filter is the same as the width and height of the input.
+  
 - **Convolution implementation of sliding windows**:
   - First lets consider that the Conv net you trained is like this (No FC all is conv layers):
     - ![](Images/20.png)
-  - Say now we have a 16 x 16 x 3 image that we need to apply the sliding windows in. By the normal implementation that have been mentioned in the section before this, we would run this Conv net four times each rectangle size will be 16 x 16.
+  - Sliding window: for each cropped image, we run them through the trained network independently to generate the labels. 
   - The convolution implementation will be as follows:
     - ![](Images/21.png)
-  - Simply we have feed the image into the same Conv net we have trained.
+  - Simply we have feed the entire image into the same Conv net we have trained.
   - The left cell of the result "The blue one" will represent the the first sliding window of the normal implementation. The other cells will represent the others.
   - Its more efficient because it now shares the computations of the four times needed.
+  - Due to the 'focusing effect' of convolution, each pixel in the final matrix corresponds to the classification result for each sliding window.
+  - Add extra classification window to make classifications for different sliding window size. 
+  
   - Another example would be:
     - ![](Images/22.png)
   - This example has a total of 16 sliding windows that shares the computation together.
   - [[Sermanet et al., 2014, OverFeat: Integrated recognition, localization and detection using convolutional networks]](https://arxiv.org/abs/1312.6229)
+
 - The weakness of the algorithm is that the position of the rectangle wont be so accurate. Maybe none of the rectangles is exactly on the object you want to recognize.
   - ![](Images/23.png)
   - In red, the rectangle we want and in blue is the required car rectangle.
