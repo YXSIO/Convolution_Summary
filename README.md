@@ -27,7 +27,7 @@ Course can be found in [Coursera](https://www.coursera.org/learn/convolutional-n
   - Understand and implement intersection over union
   - Understand how we label a dataset for an object detection application
   - Remember the vocabulary of object detection (landmark, anchor, bounding box, grid, ...)
-  - [x] [Car detection with YOLOv2](https://github.com/SSQ/Coursera-Ng-Convolutional-Neural-Networks/tree/master/Week%203%20PA%201%20Car%20detection%20with%20YOLOv2)
+  - [x] [Car detection with YOLOv2](https://github.com/YXSIO/Convolution_Summary/tree/master/Week_3/Exercise)
   
 - Week 4 Special applications: Face recognition & Neural style transfer
   - Understand One Shot Learning, Siamese Network, Triplet Loss
