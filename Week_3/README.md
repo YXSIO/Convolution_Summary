@@ -12,6 +12,7 @@
       * [Anchor Boxes](#anchor-boxes)
       * [YOLO Algorithm](#yolo-algorithm)
       * [Region Proposals (R-CNN)](#region-proposals-r-cnn)
+   * [Exercise](#exercise)
 
 
 ## Object detection
@@ -19,19 +20,17 @@
 > Learn how to apply your knowledge of CNNs to one of the toughest but hottest field of computer vision: Object detection.
 
 ### Object Localization
-
-- Object detection is one of the areas in which deep learning is doing great in the past two years.
-
+Going from image classification to localization and finally object detection. 
 - What are localization and detection?
 
   - **Image Classification**: 
-    - Classify an image to a specific class. The whole image represents one class. We don't want to know exactly where are the object. Usually only one object is presented.
+    - Classify an image to a specific class. 
     - ![](Images/Classification.jpg)
   - **Classification with localization**:
-    - Given an image we want to learn the class of the image and where are the class location in the image. We need to detect a class and a rectangle of where that object is. Usually only one object is presented.
+    - Given an image we want to learn the class of the image and where are the class location in the image. 
     - ![](Images/ClassificationLoc.jpg)
   - **Object detection**:
-    - Given an image we want to detect all the object in the image that belong to a specific classes and give their location. An image can contain more than one object with different classes.
+    - Given an image we want to detect all the object in the image that belong to a specific classes and give their location. 
     - ![](Images/ObjectDetection.png)
   - **Semantic Segmentation**:
     - We want to Label each pixel in the image with a category label. Semantic Segmentation Don't differentiate instances, only care about pixels. It detects no objects just pixels.
@@ -42,8 +41,7 @@
     - ![](Images/InstanceSegmentation.png)
 
 - To make image classification we use a Conv Net with a Softmax attached to the end of it.
-
-- To make classification with localization we use a Conv Net with a softmax attached to the end of it and a four numbers `bx`, `by`, `bh`, and `bw` to tell you the location of the class in the image. The dataset should contain this four numbers with the class too.
+- To make classification with localization we use a Conv Net with a softmax attached to the end of it and a four numbers `bx`, `by`, `bh`, and `bw` to tell you the location of the class in the image.
 
 - Defining the target label Y in classification with localization problem: 
 
@@ -60,54 +58,22 @@
     ]
     ```
 
-  - Example (Object is present):
-
-    - ```
-      Y = [
-        		1		# Object is present
-        		0
-        		0
-        		100
-        		100
-        		0
-        		1
-        		0
-      ]
-      ```
-
-  - Example (When object isn't presented):
-
-    - ```
-      Y = [
-        		0		# Object isn't presented
-        		?		# ? means we dont care with other values
-        		?
-        		?
-        		?
-        		?
-        		?
-        		?
-      ]
-      ```
-
 - The loss function for the Y we have created (Example of the square error):
 
-  - ```
-    L(y',y) = {
-      			(y1'-y1)^2 + (y2'-y2)^2 + ...           if y1 = 1
-      			(y1'-y1)^2						if y1 = 0
-    		}
-    ```
-
+  -     L(y',y) = { (y1'-y1)^2 + (y2'-y2)^2 + ...   if y1 = 1, 
+  	(y1'-y1)^2			     	    if y1 = 0  }
+    
   - In practice we use logistic regression for `pc`, log likely hood loss for classes, and squared error for the bounding box.
+
 
 ### Landmark Detection
 
 - In some of the computer vision problems you will need to output some points. That is called **landmark detection**.
 
-- For example, if you are working in a face recognition problem you might want some points on the face like corners of the eyes, corners of the mouth, and corners of the nose and so on. This can help in a lot of application like detecting the pose of the face.
+- For example, if you are working in a face recognition problem you might want some points on the face like corners of the eyes, corners of the mouth, and corners of the nose and so on. 
+- This can help in a lot of application like detecting the emotion or the gesture of a person based on these landmarks.
 
-- Y shape for the face recognition problem that needs to output 64 landmarks:
+- The key here is to define Label Y. 
 
   - ```
     Y = [
@@ -120,85 +86,74 @@
     ]
     ```
 
-- Another application is when you need to get the skeleton of the person using different landmarks/points in the person which helps in some applications.
-
-- Hint, in your labeled data, if `l1x,l1y` is the left corner of left eye, all other `l1x,l1y` of the other examples has to be the same.
-
 ### Object Detection
 
-- We will use a Conv net to solve the object detection problem using a technique called the sliding windows detection algorithm.
-- For example lets say we are working on Car object detection.
 - The first thing, we will train a Conv net on cropped car images and non car images.
+  - The ratio between positive and negative example could be 1:3.
+  - Before training a classifier, we need to re-size each training example. 
   - ![](Images/18.png)
-- After we finish training of this Conv net we will then use it with the sliding windows technique.
+
+- Inference: after we finish training of this Conv net we will then use it with the sliding windows technique.
+
 - Sliding windows detection algorithm:
   1. Decide a rectangle size.
-  2. Split your image into rectangles of the size you picked. Each region should be covered. You can use some strides.
-  3. For each rectangle feed the image into the Conv net and decide if its a car or not.
-  4. Pick larger/smaller rectangles and repeat the process from 2 to 3.
-  5. Store the rectangles that contains the cars.
-  6. If two or more rectangles intersects choose the rectangle with the best accuracy.
+  2. Split your image into rectangles of the size you picked. For each rectangle feed the image into the Conv net and decide if its a car or not.
+  3. Pick larger/smaller rectangles and repeat the process 2.
+  4. Store the rectangles that contains the cars.
+  5. If two or more rectangles intersects choose the rectangle with the best accuracy.
+
 - Disadvantage of sliding window is the computation time.
-- In the era of machine learning before deep learning, people used a hand crafted linear classifiers that classifies the object and then use the sliding window technique. The linear classier make it a cheap computation. But in the deep learning era that is so  computational expensive due to the complexity of the deep learning model.
-- To solve this problem, we can implement the sliding windows with a ***Convolutional approach***.
-- One other idea is to compress your deep learning model.
+	- To solve this problem, we can implement the sliding windows with a ***Convolutional approach***.
+	- One other idea is to compress your deep learning model.
 
 ### Convolutional Implementation of Sliding Windows
 
 - Turning FC layer into convolutional layers (predict image class from four classes):
   - ![](Images/19.png)
-  - As you can see in the above image, we turned the FC layer into a Conv layer using a convolution with the width and height of the filter is the same as the width and height of the input.
+  
 - **Convolution implementation of sliding windows**:
   - First lets consider that the Conv net you trained is like this (No FC all is conv layers):
     - ![](Images/20.png)
-  - Say now we have a 16 x 16 x 3 image that we need to apply the sliding windows in. By the normal implementation that have been mentioned in the section before this, we would run this Conv net four times each rectangle size will be 16 x 16.
+  - Sliding window: for each cropped image, we run them through the trained network independently to generate the labels. 
   - The convolution implementation will be as follows:
     - ![](Images/21.png)
-  - Simply we have feed the image into the same Conv net we have trained.
-  - The left cell of the result "The blue one" will represent the the first sliding window of the normal implementation. The other cells will represent the others.
-  - Its more efficient because it now shares the computations of the four times needed.
+  - Simply we have feed the entire image into the same Conv net we have trained.
+  - **Due to the 'focusing effect' of convolution, each pixel in the final matrix corresponds to the classification result for each sliding window.**
+  - **Add extra classification window to make classifications for different sliding window size.**
+  
   - Another example would be:
     - ![](Images/22.png)
   - This example has a total of 16 sliding windows that shares the computation together.
   - [[Sermanet et al., 2014, OverFeat: Integrated recognition, localization and detection using convolutional networks]](https://arxiv.org/abs/1312.6229)
-- The weakness of the algorithm is that the position of the rectangle wont be so accurate. Maybe none of the rectangles is exactly on the object you want to recognize.
+
+- The difference between localization and classification is that the former one also fit for the bounding boxes.
   - ![](Images/23.png)
   - In red, the rectangle we want and in blue is the required car rectangle.
 
 ### Bounding Box Predictions
 
-- A better algorithm than the one described in the last section is the [YOLO algorithm](https://arxiv.org/abs/1506.02640).
-
-- YOLO stands for *you only look once* and was developed back in 2015.
-
-- Yolo Algorithm:
+- Yolo Algorithm is applying localization algorithm to each of the grid. 
 
   - ![](Images/24.png)
 
-  1. Lets say we have an image of 100 X 100
-  2. Place a  3 x 3 grid on the image. For more smother results you should use 19 x 19 for the 100 x 100
-  3. Apply the classification and localization algorithm we discussed in a previous section to each section of the grid. `bx` and `by` will represent the center point of the object in each grid and will be relative to the box so the range is between 0 and 1 while `bh` and `bw` will represent the height and width of the object which can be greater than 1.0 but still a floating point value.
-  4. Do everything at once with the convolution sliding window. If Y shape is 1 x 8 as we discussed before then the output of the 100 x 100 image should be 3 x 3 x 8 which corresponds to 9 cell results.
+  1. Lets say we have an image of 100 X 100. Place a  3 x 3 grid on the image. 
+  2. For more smoother results you should use 19 x 19 for the 100 x 100, which will also reduce the chance of having multiple target in the same window. 
+  3. Apply the classification and localization algorithm we discussed in a previous section to each section of the grid. 
+  4. Do everything at once with the convolution sliding window.  3x3x8 is the final output. 
   5. Merging the results using predicted localization mid point.
 
+**Problems and Summary**
 - We have a problem if we have found more than one object in one grid box.
-
-- One of the best advantages that makes the YOLO algorithm popular is that it has a great speed and a Conv net implementation.
+- There is no need for designing model architecture for different sliding window size, since Yolo predefine the grid partitioning. 
+- Each pixels in the final output corresponds to a grid in the original image. 
 
 - How is YOLO different from other Object detectors?  YOLO uses a single CNN
   network for both classification and localizing the object using bounding boxes.
 
-- In the next sections we will see some ideas that can make the YOLO algorithm better.
-
 ### Intersection Over Union
 
 - Intersection Over Union is a function used to evaluate the object detection algorithm.
-- It computes size of intersection and divide it by the union. More generally, *IoU* *is a measure of the overlap between two bounding boxes*.
-- For example:
-  - ![](Images/25.png)
-  - The red is the labeled output and the purple is the predicted output.
-  - To compute Intersection Over Union we first compute the union area of the two rectangles which is "the first rectangle + second rectangle" Then compute the intersection area between these two rectangles.
-  - Finally `IOU = intersection area / Union area`
+- *IoU* *is a measure of the overlap between two bounding boxes*.
 - If `IOU >=0.5` then its good. The best answer will be 1.
 - The higher the IOU the better is the accuracy.
 
@@ -206,9 +161,6 @@
 
 - One of the problems we have addressed in YOLO is that it can detect an object multiple times.
 - Non-max Suppression is a way to make sure that YOLO detects the object just once.
-- For example:
-  - ![](Images/26.png)
-  - Each car has two or more detections with different probabilities. This came from some of the grids that thinks that this is the center point of the object.
 - Non-max suppression algorithm:
   1. Lets assume that we are targeting one class as an output class.
   2. Y shape should be `[Pc, bx, by, bh, hw]` Where Pc is the probability if that object occurs.
@@ -218,19 +170,17 @@
      2. Discard any remaining box with `IoU > 0.5` with that box output in the previous step i.e any box with high overlap(greater than overlap threshold of 0.5).
 - If there are multiple classes/object types `c` you want to detect, you should run the Non-max suppression `c` times, once for every output class.
 
-### Anchor Boxes
+### Anchor Boxes: Predict multiple bounding boxes for each grid. 
+- The size of the anchor boxes is latent which could be learnt. Similar with faster R-CNN, adding classification header to detect multiple bounding boxes shape. 
 
 - In YOLO, a grid only detects one object. What if a grid cell wants to detect multiple object?
   - ![](Images/27.png)
   - Car and person grid is same here.
-  - In practice this happens rarely.
-- The idea of Anchor boxes helps us solving this issue.
-- If Y = `[Pc, bx, by, bh, bw, c1, c2, c3]` Then to use two anchor boxes like this:
   - Y = `[Pc, bx, by, bh, bw, c1, c2, c3, Pc, bx, by, bh, bw, c1, c2, c3]`  We simply have repeated  the one anchor Y.
   - The two anchor boxes you choose should be known as a shape:
     - ![](Images/28.png)
 - So Previously, each object in training image is assigned to grid cell that contains that object's midpoint.
-- With two anchor boxes, Each object in training image is assigned to grid cell that contains object's midpoint and anchor box for the grid cell with <u>highest IoU</u>. You have to check where your object should be based on its rectangle closest to which anchor box.
+- With two anchor boxes, Each object in training image is assigned to grid cell that contains object's midpoint and anchor box for the grid cell with <u>highest IoU</u>. 
 - Example of data:
   - ![](Images/29.png)
   - Where the car was near the anchor 2 than anchor 1.
@@ -241,10 +191,7 @@
 
 ### YOLO Algorithm
 
-- YOLO is a state-of-the-art object detection model that is fast and accurate
-
 - Lets sum up and introduce the whole YOLO algorithm given an example.
-
 - Suppose we need to do object detection for our autonomous driver system.It needs to identify three classes:
 
   1. Pedestrian (Walks on ground).
@@ -255,15 +202,17 @@
 
   - Like we said in practice they use five or more anchor boxes hand made or generated using k-means.
 
-- Our labeled Y shape will be `[Ny, HeightOfGrid, WidthOfGrid, 16]`, where Ny is number of instances and each row (of size 16) is as follows:
+- Our labeled Y shape will be `[HeightOfGrid, WidthOfGrid, 16]`
 
   - `[Pc, bx, by, bh, bw, c1, c2, c3, Pc, bx, by, bh, bw, c1, c2, c3]`
 
-- Your dataset could be an image with a multiple labels and a rectangle for each label, we should go to your dataset and make the shape and values of Y like we agreed.
+- Your dataset could be an image with a multiple labels and a rectangle for each label.
 
   - An example:
     - ![](Images/30.png)
-  - We first initialize all of them to zeros and ?, then for each label and rectangle choose its closest grid point then the shape to fill it and then the best anchor point based on the IOU. so that the shape of Y for one image should be `[HeightOfGrid, WidthOfGrid,16]`
+  - We first initialize all of them to zeros and ?.
+  - Then for each label and rectangle choose its closest grid point then the shape to fill it 
+  - Then the best anchor point based on the IOU. so that the shape of Y for one image should be `[HeightOfGrid, WidthOfGrid,16]`
 
 - Train the labeled images on a Conv net. you should receive an output of `[HeightOfGrid, WidthOfGrid,16]` for our case.
 
@@ -277,12 +226,11 @@
   - Then get the best probability followed by the IOU filtering:
     - ![](Images/33.png)
 
-- YOLO are not good at detecting smaller object.
-
 - [YOLO9000 Better, faster, stronger](https://arxiv.org/abs/1612.08242)
 
-  - Summary:
-
+**Summary:**
+  - Each pixel in the final output corresponds to a grid in the raw image. This can be thought as the convolutional implementation of the sliding window. 
+  - In fast R-CNN, adding classification header on the ROIPooling CNN is similar to predicting multiple bounding boxes with different shapes. 
   - ```
     ________________________________________________________________________________________
     Layer (type)                     Output Shape          Param #     Connected to                
@@ -449,11 +397,13 @@
   - https://github.com/allanzelener/YAD2K
   - https://github.com/thtrieu/darkflow
   - https://pjreddie.com/darknet/yolo/
+  
+**Problems** 
+- YOLO are not good at detecting smaller object.
+- For many grids which clearly do not contain any target, YOLO still try to detect them.
 
 ### Region Proposals (R-CNN)
-
-- R-CNN is an algorithm that also makes an object detection.
-
+- From YOLO to R-CNN series. 
 - Yolo tells that its faster:
 
   - > Our model has several advantages over classifier-based systems. It looks at the whole image at test time so its predictions are informed by global context in the image. It also makes predictions with a single network evaluation unlike systems like R-CNN which require thousands for a single image. This makes it extremely fast, more than 1000x faster than R-CNN and 100x faster than Fast R-CNN. See our paper for more details on the full system.
@@ -461,12 +411,8 @@
 - But one of the downsides of YOLO that it process a lot of areas where no objects are present.
 
 - **R-CNN** stands for regions with Conv Nets.
-
 - R-CNN tries to pick a few windows and run a Conv net (your confident classifier) on top of them.
 
-- The algorithm R-CNN uses to pick windows is called a segmentation algorithm. Outputs something like this:
-
-  - ![](Images/34.png)
 
 - If for example the segmentation algorithm produces 2000 blob then we should run our classifier/CNN on top of these blobs.
 
@@ -478,16 +424,13 @@
     - [[Girshik et. al, 2013. Rich feature hierarchies for accurate object detection and semantic segmentation]](https://arxiv.org/abs/1311.2524)
   - Fast R-CNN:
     - Propose regions. Use convolution implementation of sliding windows to classify all the proposed regions.
+    - Adding classification header to predict objects in various anchor boxes. 
     - [[Girshik, 2015. Fast R-CNN]](https://arxiv.org/abs/1504.08083)
   - Faster R-CNN:
-    - Use convolutional network to propose regions.
+    - Use convolutional network to propose regions: it is a two stages algorithm. 
     - [[Ren et. al, 2016. Faster R-CNN: Towards real-time object detection with region proposal networks]](https://arxiv.org/abs/1506.01497)
   - Mask R-CNN:
     - https://arxiv.org/abs/1703.06870
-
-- Most of the implementation of faster R-CNN are still slower than YOLO.
-
-- Andrew Ng thinks that the idea behind YOLO is better than R-CNN because you are able to do all the things in just one time instead of two times.
 
 - Other algorithms that uses one shot to get the output includes **SSD** and **MultiBox**.
 
@@ -496,6 +439,29 @@
 - **R-FCN** is similar to Faster R-CNN but more efficient.
 
   - [[Jifeng Dai, et. al 2016 R-FCN: Object Detection via Region-based Fully Convolutional Networks ]](https://arxiv.org/abs/1605.06409)
+
+
+## Exercise
+**Summary for YOLO**:
+- Input image (608, 608, 3)
+- The input image goes through a CNN, resulting in a (19,19,5,85) dimensional output. 
+- After flattening the last two dimensions, the output is a volume of shape (19, 19, 425):
+    - Each cell in a 19x19 grid over the input image gives 425 numbers. 
+    - 425 = 5 x 85 because each cell contains predictions for 5 boxes, corresponding to 5 anchor boxes, as seen in lecture. 
+    - 85 = 5 + 80 where 5 is because $(p_c, b_x, b_y, b_h, b_w)$ has 5 numbers, and and 80 is the number of classes we'd like to detect
+- You then select only few boxes based on:
+    - Score-thresholding: throw away boxes that have detected a class with a score less than the threshold
+    - Non-max suppression: Compute the Intersection over Union and avoid selecting overlapping boxes
+- This gives you YOLO's final output. 
+
+**What you should remember**:
+- YOLO is a state-of-the-art object detection model that is fast and accurate
+- It runs an input image through a CNN which outputs a 19x19x5x85 dimensional volume. 
+- The encoding can be seen as a grid where each of the 19x19 cells contains information about 5 boxes.
+- You filter through all the boxes using non-max suppression. Specifically: 
+    - Score thresholding on the probability of detecting a class to keep only accurate (high probability) boxes
+    - Intersection over Union (IoU) thresholding to eliminate overlapping boxes
+- Because training a YOLO model from randomly initialized weights is non-trivial and requires a large dataset as well as lot of computation, we used previously trained model parameters in this exercise. If you wish, you can also try fine-tuning the YOLO model with your own dataset, though this would be a fairly non-trivial exercise. 
 
 <br><br>
 These Notes were made by [Yuxiang ZHANG](mailto:kimiyuxiang@gmail.com) @2020
