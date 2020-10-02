@@ -122,6 +122,11 @@ This is the fourth course of the deep learning specialization at [Coursera](http
   - The convolutional block:
     - ![](Images/17.png)
     - The conv can be bottleneck 1 x 1 conv
+    
+### Why res-Net works
+We also saw in lecture that having ResNet blocks with the shortcut also makes it very easy for one of the blocks to learn an identity function. 
+This means that you can stack on additional ResNet blocks with little risk of harming training set performance. 
+(There is also some evidence that the ease of learning an identity function--even more than skip connections helping with vanishing gradients--accounts for ResNets' remarkable performance.
 
 ### Network in Network and 1 X 1 convolutions
 

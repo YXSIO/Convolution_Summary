@@ -18,8 +18,8 @@ Course can be found in [Coursera](https://www.coursera.org/learn/convolutional-n
   - Build a deep neural network using Keras
   - Implement a skip-connection in your network
   - Clone a repository from github and use transfer learning
-  - [x] [Keras - Tutorial - Happy House v2](https://github.com/SSQ/Coursera-Ng-Convolutional-Neural-Networks/tree/master/Week%202%20PA%201%20Keras%20-%20Tutorial%20-%20Happy%20House%20v2)
-  - [x] [Residual Networks - v2](https://github.com/SSQ/Coursera-Ng-Convolutional-Neural-Networks/tree/master/Week%202%20PA%202%20Residual%20Networks%20-%20v2)
+  - [x] [Keras - Tutorial - Happy House v2](https://github.com/YXSIO/Convolution_Summary/tree/master/Week_2/Exercise)
+  - [x] [Residual Networks - v2](https://github.com/YXSIO/Convolution_Summary/tree/master/Week_2/Exercise)
   
 - Week 3 Object detection
   - Understand the challenges of Object Localization, Object Detection and Landmark Finding
